@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require 'erbgood'
+
+binding_path, *erb_paths = ARGV
+
+binding_path = File.expand_path(binding_path)
+
+bindin = Module.new.module_eval("#{File.read(binding_path)}\nbinding")
+
+return_code = 0
+
+puts "Binding: #{binding_path}\n\n"
+
+erb_paths.each do |erb|
+  print "#{erb}: "
+
+  error = Erbgood::ErbBindingCheck.new(bindin, File.read(erb)).error
+
+  if error
+    puts "\n  #{error}"
+    return_code = 1
+  else
+    puts 'ok'
+  end
+end
+
+exit return_code
